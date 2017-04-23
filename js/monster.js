@@ -1,5 +1,5 @@
 class Monster {
-	constructor(x, y, type, spx, spy, speed, attack) {
+	constructor(x, y, type, spx, spy, speed, attack, value) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
@@ -7,6 +7,7 @@ class Monster {
 		this.spy = spy;
 		this.speed = speed;
 		this.attack = attack;
+		this.value = value;
 
 		this.node = -1;
 		this.target_node = -1;
@@ -71,6 +72,6 @@ const WalkerMonster = 0;
 
 class Walker extends Monster {
 	constructor(x, y) {
-		super(x, y, WalkerMonster, 0, 3, 1, 25);
+		super(x, y, WalkerMonster, 0, 3, 1, 25, 1);
 	}
 }

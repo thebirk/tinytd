@@ -44,20 +44,27 @@ function add_font_color(game, color, color_val) {
 }
 
 function draw_string(game, str, x, y, color) {
-	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0:";
+	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0:-h";
 
 	for(var i = 0; i < str.length; i++) {
+		if(str[i] == ' ') continue;
+
 		var c = font_layout.indexOf(str[i]);
-		if(c == ' ') continue;
 
 		var xx = (c % 16) | 0;
 		var yy = (c / 16) | 0;
+
 		game.c.drawImage(
 			game.fonts[color],
 			xx*8, yy*8, 8, 8,
 			x + 8*i, y, 8, 8
 		);
 	}
+}
+
+function pad_int(num, size) {
+    var s = "000000000" + num;
+    return s.substr(s.length-size);
 }
 
 function keydown(e, game) {
@@ -204,7 +211,9 @@ function main() {
 	add_font_color(game, "yellow", 0xFFFF00);
 	add_font_color(game, "red", 0xFF0000);
 
-	loop(game);
+	setInterval(function() {
+		loop(game);
+	}, 1000/60)
 }
 
 function update(game) {
@@ -223,8 +232,8 @@ function loop(game) {
 	render_map(game);
 
 	draw_rect(game, 0, 14*8, 8*16, 16, "black");
-	draw_string(game, game.map.money + "$", 0, 14*8, "yellow");
-	draw_string(game, "HP:" + game.map.hp, 0, 15*8, "red");
+	draw_string(game, "$" + pad_int(game.map.money, 3), 0, 14*8, "yellow");
+	draw_string(game, "h" + pad_int(game.map.hp, 3), 0, 15*8, "red");
 
 	if(game.hittimer > 0) {
 		game.c.globalAlpha = 0.5;
@@ -232,8 +241,4 @@ function loop(game) {
 		game.c.globalAlpha = 1;
 		game.hittimer--;
 	}
-
-	window.requestAnimationFrame(function() {
-		loop(game);
-	});
 }
