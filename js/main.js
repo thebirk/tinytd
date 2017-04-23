@@ -100,16 +100,46 @@ function keyup(e, game) {
 	if(e.key == "s") {
 		game.map.monsters.push(new Walker());
 	}
+	if(e.key == "b") {
+		if(game.state != StateShop) {
+			game.state = StateShop;
+		} else {
+			game.state = StateGame;
+		}
+	}
 }
 
 function mousemove(e, game) {
+	game.mouse_x = (e.offsetX / game.scale) | 0;
+	game.mouse_y = (e.offsetY / game.scale) | 0;
+}
 
+function mouseup(e, game) {
+	if(e.button == 0) {
+		game.mouse_down = false;	
+	}
+}
+
+function mousedown(e, game) {
+	if(e.button == 0) {
+		game.mouse_down = true;	
+	}
 }
 
 function mouseclick(e, game) {
-	var x = e.offsetX / game.scale / 8;
-	var y = e.offsetY / game.scale / 8;
-	console.log("x: " + (x|0) + ", y: "+ (y|0));
+	switch(game.state) {
+		case StateGame: {
+			if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8)) {
+				game.state = StateShop;
+			}
+		} break;
+		
+		case StateShop: {
+			if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8)) {
+				game.state = StateGame;
+			}
+		} break;
+	}
 }
 
 function testmap(game) {
@@ -152,6 +182,9 @@ function testmap(game) {
 		monsters: [new Walker()],
 	};
 }
+
+const StateGame = 0;
+const StateShop = 1;
 
 function render_map(game) {
 	var map = game.map;
@@ -214,6 +247,8 @@ function setup_scales(game) {
 	});
 }
 
+const shop_button_id = 1;
+
 function main() {
 	var game = {
 		canvas: document.getElementById("game_canvas"),
@@ -223,6 +258,12 @@ function main() {
 		scale: 4,
 
 		mute: true,
+
+		mouse_down: false,
+		mouse_x: 0,
+		mouse_y: 0,
+		
+		state: StateGame,
 
 		art: document.getElementById("art"),
 		fonts: {
@@ -253,6 +294,13 @@ function main() {
 		mouseclick(e, game);
 	});
 
+	game.canvas.addEventListener("mouseup", function(e) {
+		mouseup(e, game);
+	});
+	game.canvas.addEventListener("mousedown", function(e) {
+		mousedown(e, game);
+	});
+
 	setup_scales(game);
 	testmap(game);
 
@@ -268,9 +316,66 @@ function main() {
 }
 
 function update(game) {
-	for(var i = 0; i < game.map.monsters.length; i++) {
-		var m = game.map.monsters[i];
-		m.update(game);
+	switch(game.state) {
+		case StateGame: {
+			for(var i = 0; i < game.map.monsters.length; i++) {
+				var m = game.map.monsters[i];
+				m.update(game);
+			}
+		} break;
+		
+		case StateShop: {
+
+		} break;
+	}
+}
+
+function aabb(x0, y0, x1, y1, w, h) {
+	if(
+        x0 < x1 ||
+        x0 >= x1 + w ||
+        y0 < y1 ||
+        y0 >= y1 + h
+    ) {
+        return false;
+    }
+    
+	return true;
+}
+
+function render_game(game) {
+	render_map(game);
+
+	draw_rect(game, 0, 14*8, 8*16, 16, "black");
+	draw_string(game, "$" + pad_int(game.map.money, 3), 0, 14*8, "yellow");
+	draw_string(game, "h" + pad_int(game.map.hp, 3), 0, 15*8, "red");
+
+	if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8)) {
+		draw_string(game, "SHOP", 12*8, 15*8, "yellow");
+	} else if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8) && game.mouse_down) {
+		draw_string(game, "SHOP", 12*8, 15*8, "red");
+	} else {
+		draw_string(game, "SHOP", 12*8, 15*8, "white");
+	}
+
+	if(game.hittimer > 0) {
+		game.c.globalAlpha = 0.5;
+		draw_rect(game, 0, 0, game.width, game.height-16, "red");
+		game.c.globalAlpha = 1;
+		game.hittimer--;
+	}
+}	
+
+function render(game) {
+	switch(game.state) {
+		case StateGame: {
+			render_game(game);
+		} break;
+
+		case StateShop: {
+			render_game(game);
+			draw_shop(game);
+		} break;
 	}
 }
 
@@ -279,18 +384,5 @@ function loop(game) {
 
 	update(game);
 
-	render_map(game);
-
-	draw_rect(game, 0, 14*8, 8*16, 16, "black");
-	draw_string(game, "$" + pad_int(game.map.money, 3), 0, 14*8, "yellow");
-	draw_string(game, "h" + pad_int(game.map.hp, 3), 0, 15*8, "red");
-
-	draw_shop(game);
-
-	if(game.hittimer > 0) {
-		game.c.globalAlpha = 0.5;
-		draw_rect(game, 0, 0, game.width, game.height-16, "red");
-		game.c.globalAlpha = 1;
-		game.hittimer--;
-	}
+	render(game);
 }
