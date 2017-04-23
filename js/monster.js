@@ -41,6 +41,9 @@ class Monster {
 				if(this.node == game.map.nodes.length-1) {
 					// reached the finish
 					console.log("ouch!");
+					game.hittimer = 5;
+					game.hurt_sound.play();
+
 					game.map.hp -= this.attack;
 					this.remove = true;
 				}
@@ -68,6 +71,6 @@ const WalkerMonster = 0;
 
 class Walker extends Monster {
 	constructor(x, y) {
-		super(x, y, WalkerMonster, 0, 3, 1	, 25);
+		super(x, y, WalkerMonster, 0, 3, 1, 25);
 	}
 }

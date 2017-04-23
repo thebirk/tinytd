@@ -44,7 +44,7 @@ function add_font_color(game, color, color_val) {
 }
 
 function draw_string(game, str, x, y, color) {
-	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0";
+	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0:";
 
 	for(var i = 0; i < str.length; i++) {
 		var c = font_layout.indexOf(str[i]);
@@ -91,6 +91,7 @@ function testmap(game) {
 		width: 16,
 		height: 14,
 		hp: 100,
+		money: 50,
 
 		tiles: [
 			0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -173,6 +174,8 @@ function main() {
 			"white": art,
 		},
 
+		hurt_sound: document.getElementById("hurt"),
+
 		map: null,
 	};
 	game.canvas.width = game.width*game.scale;
@@ -199,6 +202,7 @@ function main() {
 
 	game.c.imageSmoothingEnabled = false;
 	add_font_color(game, "yellow", 0xFFFF00);
+	add_font_color(game, "red", 0xFF0000);
 
 	loop(game);
 }
@@ -218,7 +222,16 @@ function loop(game) {
 	//draw_rect(game, 20, 20, 50, 50, "red");
 	render_map(game);
 
-	draw_string(game, "1234567890$", 0, 14*8, "yellow");
+	draw_rect(game, 0, 14*8, 8*16, 16, "black");
+	draw_string(game, game.map.money + "$", 0, 14*8, "yellow");
+	draw_string(game, "HP:" + game.map.hp, 0, 15*8, "red");
+
+	if(game.hittimer > 0) {
+		game.c.globalAlpha = 0.5;
+		draw_rect(game, 0, 0, game.width, game.height-16, "red");
+		game.c.globalAlpha = 1;
+		game.hittimer--;
+	}
 
 	window.requestAnimationFrame(function() {
 		loop(game);
