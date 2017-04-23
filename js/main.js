@@ -69,18 +69,6 @@ function draw_string(game, str, x, y, color) {
 	}
 }
 
-function draw_shop(game) {
-	draw_rect(game, 8, 8, game.width-16, game.height-8*4, "#aaa");
-	
-	// title
-	draw_rect(game, 8, 8, game.width-16, 8, "#222");
-	draw_string(game, "SHOP", 16, 8, "white");
-
-	// arrows
-	draw_string(game, "<", 8, 7*8, "white");
-	draw_string(game, ">", 14*8, 7*8, "white");
-}
-
 function pad_int(num, size) {
     var s = "000000000" + num;
     return s.substr(s.length-size);
@@ -137,6 +125,13 @@ function mouseclick(e, game) {
 		case StateShop: {
 			if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8)) {
 				game.state = StateGame;
+			}
+
+			if(aabb(game.mouse_x, game.mouse_y, 8, 8*2, 8, 8*11)) {
+				console.log("left");
+			}
+			if(aabb(game.mouse_x, game.mouse_y, 14*8, 8*2, 8, 8*11)) {
+				console.log("right");
 			}
 		} break;
 	}
@@ -265,6 +260,8 @@ function main() {
 		
 		state: StateGame,
 
+		shop_page: 0,
+
 		art: document.getElementById("art"),
 		fonts: {
 			"white": art,
@@ -307,6 +304,13 @@ function main() {
 	game.c.imageSmoothingEnabled = false;
 	add_font_color(game, "yellow", 0xFFFF00);
 	add_font_color(game, "red", 0xFF0000);
+
+	game.shop_list = [
+		new Walker(0, 0),
+		new Walker(0, 0),
+		new Walker(0, 0),
+		new Walker(0, 0),
+	];
 
 	game.canvas.focus();
 
@@ -352,8 +356,6 @@ function render_game(game) {
 
 	if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8)) {
 		draw_string(game, "SHOP", 12*8, 15*8, "yellow");
-	} else if(aabb(game.mouse_x, game.mouse_y, 12*8, 15*8, 8*4, 8) && game.mouse_down) {
-		draw_string(game, "SHOP", 12*8, 15*8, "red");
 	} else {
 		draw_string(game, "SHOP", 12*8, 15*8, "white");
 	}
@@ -364,7 +366,31 @@ function render_game(game) {
 		game.c.globalAlpha = 1;
 		game.hittimer--;
 	}
-}	
+}
+
+function draw_shop(game) {
+	draw_rect(game, 8, 8, game.width-16, game.height-8*4, "#aaa");
+	
+	// title
+	draw_rect(game, 8, 8, game.width-16, 8, "#222");
+	draw_string(game, "SHOP", 16, 8, "white");
+
+	// arrows
+	if(aabb(game.mouse_x, game.mouse_y, 8, 8*2, 8, 8*11)) {
+		draw_string(game, "<", 8, 7*8, "yellow");
+	} else {
+		draw_string(game, "<", 8, 7*8, "white");
+	}
+
+	if(aabb(game.mouse_x, game.mouse_y, 14*8, 8*2, 8, 8*11)) {
+		draw_string(game, ">", 14*8, 7*8, "yellow");
+	} else {
+		draw_string(game, ">", 14*8, 7*8, "white");
+	}
+
+	var offset = game.shop_page * 2;
+
+}
 
 function render(game) {
 	switch(game.state) {
