@@ -43,7 +43,7 @@ class Monster {
 					// reached the finish
 					console.log("ouch!");
 					game.hittimer = 5;
-					game.hurt_sound.play();
+					if(!game.mute) game.hurt_sound.play();
 
 					game.map.hp -= this.attack;
 					this.remove = true;

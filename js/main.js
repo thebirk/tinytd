@@ -11,6 +11,13 @@ function draw_rect(game, x, y, w, h, color) {
 	c.fillRect(x, y, w, h);
 }
 
+function outline_rect(game, x, y, w, h, lw, color) {
+	var c = game.c;
+	c.fillStyle = color;
+	c.lineWidth = lw;
+	c.strokeRect(x, y, w, h);
+}
+
 function draw_sprite(game, x, y, spx, spy) {
 	game.c.drawImage(
 		game.art,
@@ -44,7 +51,7 @@ function add_font_color(game, color, color_val) {
 }
 
 function draw_string(game, str, x, y, color) {
-	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0:-h";
+	var font_layout = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!?#$0:-h<>";
 
 	for(var i = 0; i < str.length; i++) {
 		if(str[i] == ' ') continue;
@@ -60,6 +67,18 @@ function draw_string(game, str, x, y, color) {
 			x + 8*i, y, 8, 8
 		);
 	}
+}
+
+function draw_shop(game) {
+	draw_rect(game, 8, 8, game.width-16, game.height-8*4, "#aaa");
+	
+	// title
+	draw_rect(game, 8, 8, game.width-16, 8, "#222");
+	draw_string(game, "SHOP", 16, 8, "white");
+
+	// arrows
+	draw_string(game, "<", 8, 7*8, "white");
+	draw_string(game, ">", 14*8, 7*8, "white");
 }
 
 function pad_int(num, size) {
@@ -168,6 +187,33 @@ function render_map(game) {
 	}
 }
 
+function set_scale(game, scale) {
+	game.scale = scale;
+	game.canvas.width = game.width*game.scale;
+	game.canvas.height = game.height*game.scale;
+
+	game.c.scale(game.scale, game.scale);
+	game.c.imageSmoothingEnabled = false;
+}
+
+function setup_scales(game) {
+	document.getElementById("scale1").addEventListener("click", function() {
+		set_scale(game, 1);
+	});
+	document.getElementById("scale2").addEventListener("click", function() {
+		set_scale(game, 2);
+	});
+	document.getElementById("scale3").addEventListener("click", function() {
+		set_scale(game, 3);
+	});
+	document.getElementById("scale4").addEventListener("click", function() {
+		set_scale(game, 4);
+	});
+	document.getElementById("scale5").addEventListener("click", function() {
+		set_scale(game, 5);
+	});
+}
+
 function main() {
 	var game = {
 		canvas: document.getElementById("game_canvas"),
@@ -175,6 +221,8 @@ function main() {
 		width: 128,
 		height: 128,
 		scale: 4,
+
+		mute: true,
 
 		art: document.getElementById("art"),
 		fonts: {
@@ -205,6 +253,7 @@ function main() {
 		mouseclick(e, game);
 	});
 
+	setup_scales(game);
 	testmap(game);
 
 	game.c.imageSmoothingEnabled = false;
@@ -230,12 +279,13 @@ function loop(game) {
 
 	update(game);
 
-	//draw_rect(game, 20, 20, 50, 50, "red");
 	render_map(game);
 
 	draw_rect(game, 0, 14*8, 8*16, 16, "black");
 	draw_string(game, "$" + pad_int(game.map.money, 3), 0, 14*8, "yellow");
 	draw_string(game, "h" + pad_int(game.map.hp, 3), 0, 15*8, "red");
+
+	draw_shop(game);
 
 	if(game.hittimer > 0) {
 		game.c.globalAlpha = 0.5;
