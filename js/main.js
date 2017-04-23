@@ -11,6 +11,16 @@ function draw_rect(game, x, y, w, h, color) {
 	c.fillRect(x, y, w, h);
 }
 
+function draw_sprite(game, x, y, spx, spy) {
+	game.c.drawImage(
+		game.art,
+		spx*8, spy*8,
+		8, 8,
+		x, y,
+		8, 8
+	);
+}
+
 function add_font_color(game, color, color_val) {
 	var font = document.createElement("canvas");
 	font.width = game.art.width;
@@ -51,11 +61,19 @@ function draw_string(game, str, x, y, color) {
 }
 
 function keydown(e, game) {
+	if(e.defaulPrevented) return;
 
+	if(e.key == "d") {
+		game.map.monsters.push(new Walker());
+	}
 }
 
 function keyup(e, game) {
+	if(e.defaulPrevented) return;
 
+	if(e.key == "s") {
+		game.map.monsters.push(new Walker());
+	}
 }
 
 function mousemove(e, game) {
@@ -63,34 +81,48 @@ function mousemove(e, game) {
 }
 
 function mouseclick(e, game) {
-	var x = e.offsetX / game.scale;
-	var y = e.offsetY / game.scale;
-	console.log("x: " + (x|0) + ", y: " + (y|0));
+	var x = e.offsetX / game.scale / 8;
+	var y = e.offsetY / game.scale / 8;
+	console.log("x: " + (x|0) + ", y: "+ (y|0));
 }
 
 function testmap(game) {
 	game.map = {
 		width: 16,
 		height: 14,
+		hp: 100,
 
 		tiles: [
-			0, 0, 0, 2, 1, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,
+			0,0,0,0,0,0,0,0,0,0,1,1,1,0,2,0,
+			0,0,0,0,0,0,0,0,0,0,1,1,1,0,2,0,
+			0,0,0,2,2,2,2,2,2,0,1,1,1,0,2,0,
+			0,0,0,2,0,0,0,0,2,0,0,0,0,0,2,0,
+			0,0,0,2,0,0,0,0,2,0,0,0,0,0,2,0,
+			0,0,0,2,0,0,0,0,2,2,2,2,2,2,2,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,
 		],
+
+		nodes: [
+			{x:1*8,y:-1*8},
+			{x:1*8,y:2*8},
+			{x:14*8,y:2*8},
+			{x:14*8,y:9*8},
+			{x:8*8,y:9*8},
+			{x:8*8,y:6*8},
+			{x:3*8,y:6*8},
+			{x:3*8,y:14*8},
+		],
+
+		monsters: [new Walker()],
 	};
 }
 
@@ -120,6 +152,11 @@ function render_map(game) {
 
 			draw_rect(game, x*8, y*8, 8, 8, color);
 		}
+	}
+
+	for(var i = 0; i < game.map.monsters.length; i++) {
+		var m = game.map.monsters[i];
+		m.render(game);
 	}
 }
 
@@ -166,13 +203,22 @@ function main() {
 	loop(game);
 }
 
+function update(game) {
+	for(var i = 0; i < game.map.monsters.length; i++) {
+		var m = game.map.monsters[i];
+		m.update(game);
+	}
+}
+
 function loop(game) {
 	canvas_clear(game);
+
+	update(game);
 
 	//draw_rect(game, 20, 20, 50, 50, "red");
 	render_map(game);
 
-	draw_string(game, "100$", 0, 14*8, "yellow");
+	draw_string(game, "1234567890$", 0, 14*8, "yellow");
 
 	window.requestAnimationFrame(function() {
 		loop(game);
