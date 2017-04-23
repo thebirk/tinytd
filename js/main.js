@@ -211,6 +211,8 @@ function main() {
 	add_font_color(game, "yellow", 0xFFFF00);
 	add_font_color(game, "red", 0xFF0000);
 
+	game.canvas.focus();
+
 	setInterval(function() {
 		loop(game);
 	}, 1000/60)
